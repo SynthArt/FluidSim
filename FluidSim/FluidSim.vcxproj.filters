@@ -18,6 +18,9 @@
     <ClCompile Include="FluidSim.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Fluid.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Fluid.h">

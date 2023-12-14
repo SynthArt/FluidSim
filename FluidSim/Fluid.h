@@ -12,19 +12,14 @@ class Fluid {
 	float visc;
 	float gridH;
 
-	float density[N][N];	float s[N][N];
-	float v[N][N];			float u[N][N];
-	float v0[N][N];			float u0[N][N];
+	std::vector<std::vector<float>> density;	std::vector<std::vector<float>> s;
+	std::vector<std::vector<float>> v;			std::vector<std::vector<float>> u;
+	std::vector<std::vector<float>> v0;			std::vector<std::vector<float>> u0;
 
-	float bf[N][N]; // body forces - not working correctly
-
-	Fluid(float dt, float diffusion, float viscosity) {
-		this->dt = dt;
-		this->diff = diffusion;
-		this->visc = viscosity;
-		this->gridH = SCALE;
-		//this.grvity = new float[N][N];
-	}
+	std::vector<float> bf; // body forces - not working correctly
+	
+	public:
+		Fluid(float dt, float diffusion, float viscosity);
 
 	void fadeD();
 
@@ -36,17 +31,17 @@ class Fluid {
 
 	void renderVelocity();
 
-	void add_source(float (*x)[N][N], float (*b)[N][N]);
+	void add_source(std::vector<std::vector<float>> x, std::vector<std::vector<float>> b);
 
-	void set_bnd(int b, float (*x)[N][N]);
+	void set_bnd(int b, std::vector<std::vector<float>> x);
 
-	void lin_solve(int B, float (*x)[N][N], float (*b)[N][N], float a, float c);
+	void lin_solve(int B, std::vector<std::vector<float>> x, std::vector<std::vector<float>> b, float a, float c);
 
-	void diffuse(int b, float (*dens)[N][N], float (*dens0)[N][N], float dFactor);
+	void diffuse(int b, std::vector<std::vector<float>> dens, std::vector<std::vector<float>> dens0, float dFactor);
 
-	void advect(int b, float (*dens)[N][N], float (*dens0)[N][N], float (*u)[N][N], float (*v)[N][N]);
+	void advect(int b, std::vector<std::vector<float>> dens, std::vector<std::vector<float>> dens0, std::vector<std::vector<float>> u, std::vector<std::vector<float>> v);
 
-	void project(float (*u)[N][N], float (*v)[N][N], float (*div)[N][N], float (*p)[N][N]);
+	void project(std::vector<std::vector<float>> u, std::vector<std::vector<float>> v, std::vector<std::vector<float>> div, std::vector<std::vector<float>> p);
 
 	void step();
 
@@ -56,7 +51,7 @@ class Fluid {
 
 	void advect_step();
 
-	void SWAP(float x0, float (*x)[N][N]);
+	void SWAP(std::vector<std::vector<float>> x0, std::vector<std::vector<float>> x);
 
 	int TI(int index);
 };

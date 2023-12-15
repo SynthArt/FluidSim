@@ -1,6 +1,7 @@
 #include "Fluid.h"
-//#include "raylib.h"
 #include <algorithm> 
+#include <iostream>
+
 
 template<class T>
 const T& constrain(const T& x, const T& a, const T& b) {
@@ -20,16 +21,10 @@ Fluid::Fluid(float dt, float diffusion, float viscosity) {
     this->visc = viscosity;
     this->gridH = SCALE;
     //this.grvity = new float[N][N];
-
-    
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
-            density.resize(N);  s.resize(N);
-            v.resize(N);        u.resize(N);
-            v0.resize(N);       u0.resize(N);
-            bf.resize(N);
-        }
-    }
+    density.resize(N, std::vector<float>(N));  s.resize(N, std::vector<float>(N));
+    v.resize(N, std::vector<float>(N));        u.resize(N, std::vector<float>(N));
+    v0.resize(N, std::vector<float>(N));       u0.resize(N, std::vector<float>(N));
+    bf.resize(N, std::vector<float>(N));
     
 }
 
@@ -44,6 +39,12 @@ void Fluid::addDensity(int x, int y, float dValue) {
     if (x >= N || y >= N || x < 0 || y < 0)
         return;
     this->density[TI(x)][TI(y)] += dValue;
+    float val = this->density[x][y];
+    if (val < 0)
+        this->density[x][y] = 0;
+    if (val > 255)
+        this->density[x][y] = 255;   
+    //std::cout << this->density[x][y] << std::endl;
 }
 
 void Fluid::addVelocity(int x, int y, float amntX, float amntY) {
@@ -55,13 +56,14 @@ void Fluid::addVelocity(int x, int y, float amntX, float amntY) {
 
 void Fluid::renderDensity() {
     for (int i = 0; i < N; i++) {
+        float x = i * SCALE;
         for (int j = 0; j < N; j++) {
-            float x = i * SCALE;
             float y = j * SCALE;
             float densityValue = this->density[TI(i)][TI(j)];
-            //colorMode(HSB,360,100,100);
-            //Color densityClr = { 0, densityValue, densityValue};
-            //DrawRectangle(x,y,SCALE,SCALE,densityClr);
+            Color densityClr = {0, densityValue, densityValue, 255};
+            //if(this->density[i][j] > 0)
+                //std::cout << this->density[i][j] << std::endl;
+            DrawRectangle(x,GetScreenWidth()-y,SCALE,SCALE,densityClr);
         }
     }
 }
@@ -73,8 +75,8 @@ void Fluid::renderVelocity() {
             float y = j * SCALE;
             float vx = this->u[TI(i)][TI(j)];
             float vy = this->v[TI(i)][TI(j)];
-            if (!(abs(vx) < 0.1 && abs(vy) <= 0.1)) {
-                //DrawLine(x, y, x + vx * SCALE, y + vy * SCALE, {255,255,255} );
+            if (!(abs(vx) < 0.1f && abs(vy) <= 0.1f)) {
+                DrawLine(x, y, x + vx * SCALE, y + vy * SCALE, {255,255,255,255} );
             }
         }
     }
@@ -179,7 +181,7 @@ void Fluid::step() {
     // u is vx and v is vy
     advect_step();
     dens_step();
-    forces_step();
+    //forces_step();
 }
 
 void Fluid::forces_step() {

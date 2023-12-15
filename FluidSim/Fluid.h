@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <raylib.h>
 
 #define N 128
 #define SCALE 6
@@ -16,7 +17,7 @@ class Fluid {
 	std::vector<std::vector<float>> v;			std::vector<std::vector<float>> u;
 	std::vector<std::vector<float>> v0;			std::vector<std::vector<float>> u0;
 
-	std::vector<float> bf; // body forces - not working correctly
+	std::vector<std::vector<float>> bf; // body forces - not working correctly
 	
 	public:
 		Fluid(float dt, float diffusion, float viscosity);

@@ -2,34 +2,48 @@
 //
 #include "raylib.h"
 #include "Fluid.h" 
+#include <iostream>
 int main()
 {
     const int screenWidth = N*SCALE;
-        const int screenHeight = N*SCALE;
+    const int screenHeight = N*SCALE;
     InitWindow(screenWidth,screenHeight, "My Fluid Sim :)");
+    RenderTexture2D Canvas = LoadRenderTexture(screenWidth, screenHeight);
     SetTargetFPS(60);
     Fluid MyFluid(0.025f,2,0);
 
-    while(!WindowShouldClose()) {
-        
-        MyFluid.step();
-        MyFluid.renderDensity();
+    Vector2 pmouse = GetMousePosition();
+    Vector2 mouse = GetMousePosition();
 
-        Vector2 pmouse = GetMouseDelta();
-        Vector2 mouse = GetMousePosition();
-        if (IsMouseButtonDown) {
-            MyFluid.addDensity(mouse.x / SCALE, mouse.y / SCALE, 500);
-            float amntX = mouse.x - pmouse.x;
-            float amntY = mouse.y - pmouse.y;
-            MyFluid.addVelocity(mouse.x / SCALE, mouse.y / SCALE, amntX, amntY);
-        }
+    while(!WindowShouldClose()) {
+        pmouse = mouse;
+        mouse = GetMousePosition();
+        MyFluid.step();
         
-        /*
+        BeginTextureMode(Canvas);
+            MyFluid.renderDensity();
+            MyFluid.renderVelocity();
+        EndTextureMode();
+        
         BeginDrawing();
-            ClearBackground(BLACK);
+            DrawTexture(Canvas.texture, 0, 0, WHITE);
         EndDrawing();
+
+        /*
+        int rectX = (screenWidth / 2) / SCALE;
+        int rectY = (screenHeight - (screenHeight / 2)) / SCALE;
+        MyFluid.addDensity(rectX, rectY, 255);
         */
+
+        if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+            MyFluid.addDensity(mouse.x / SCALE, (mouse.y) / SCALE, 15);
+            float amntX = mouse.x - pmouse.x;
+            float amntY = (screenHeight-mouse.y) - (screenHeight-pmouse.y);
+            MyFluid.addVelocity(mouse.x / SCALE, (screenHeight-mouse.y) / SCALE, amntX, amntY);
+        }
     }
+    CloseWindow();
+    return 0;
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

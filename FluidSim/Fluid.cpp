@@ -34,7 +34,6 @@ Fluid::Fluid(float dt, float diffusion, float viscosity) {
     v.resize(N, std::vector<float>(N));        u.resize(N, std::vector<float>(N));
     v0.resize(N, std::vector<float>(N));       u0.resize(N, std::vector<float>(N));
     bf.resize(N, std::vector<float>(N));
-    
 }
 
 void Fluid::fadeD() {
@@ -70,7 +69,7 @@ void Fluid::renderDensity() {
                 densityValue = 255;
            
             Color densityClr = { 0, densityValue, densityValue, 255 };
-            DrawRectangle(x,GetScreenWidth()-y,SCALE,SCALE,densityClr);
+            DrawRectangle(x,y,SCALE,SCALE,densityClr);
         }
     }
 }
@@ -121,9 +120,6 @@ void Fluid::lin_solve(int B, std::vector<std::vector<float>> &x, const std::vect
         for (i = 1; i < N - 1; i++) {
             for (j = 1; j < N - 1; j++) {
                 x[TI(i)][TI(j)] = (b[TI(i)][TI(j)] + a * (x[TI(i + 1)][TI(j)] + x[TI(i - 1)][TI(j)] + x[TI(i)][TI(j + 1)] + x[TI(i)][TI(j - 1)])) / c;
-                //if(x[i][j] > 0) printf("ADVECT FLAG %f \n", x[i][j]);
-                // pseudo code below v
-                //denseNext[i,j] = ( densityInitial[i,j] + k * (densityInitial[i+1,j] + densityInitial[i-1,j] + densityInitial[i,j+1] + densityInitial[i,j-1]) ) / (1 + k);
             }
         }
         set_bnd(B, x);
@@ -133,14 +129,12 @@ void Fluid::lin_solve(int B, std::vector<std::vector<float>> &x, const std::vect
 void Fluid::diffuse(int b, std::vector<std::vector<float>> &dens, const std::vector<std::vector<float>> &dens0, float dFactor) {
     float k = dt * dFactor * pow(SCALE, -2);
     lin_solve(b, dens, dens0, k, 1 + 4 * k);
-    //printf("DIFFUSE FLAG: %f \n", k);
 }
 
 void Fluid::advect(int b, std::vector<std::vector<float>> &dens, const std::vector<std::vector<float>> &dens0, const std::vector<std::vector<float>> &u, const std::vector<std::vector<float>> &v) {
     int i, j, i0, j0, i1, j1;
     float x, y, s0, t0, s1, t1, dt0;
     dt0 = dt * pow(SCALE, 2); // advection rate
-    //printf("Advection rate: %f ",dt0);
     
     for (i = 1; i < N - 1; i++) {
         for (j = 1; j < N - 1; j++) { // flag: making this to N-2 diffuses velocity field at normal rate but causes boundary issues
@@ -191,7 +185,7 @@ void Fluid::project(std::vector<std::vector<float>> &u, std::vector<std::vector<
 
 void Fluid::step() {
     // u is vx and v is vy
-    advect_step();
+    advect_step(); // CAUSING MAJOR LAG
     dens_step();
     //forces_step();
 }
@@ -205,40 +199,15 @@ void Fluid::forces_step() {
             //bf[i][j] = 9.81/(SCALE*1);
         }
     }
-    //project(u0, v0, u, v);
-    //project(u, v, u0, v0);
-    //pow(9.18,-2) * density[i][j];
-    //add_source(v0,bf);
 }
 
 void Fluid::dens_step() {
-    /*
-     add_source(density, s);
-     SWAP(density,s);
-     diffuse(0, density,s);
-
-     SWAP(density,s);
-     advect(0,density,s,u,v);
-     */
     add_source(s, density);
-    //SWAP(density,s);
     diffuse(0, s, density, diff);
-    //SWAP(density,s);
     advect(0, density, s, u, v);
 }
 
 void Fluid::advect_step() {
-    /*
-     add_source(u, u0); add_source(v, v0);
-     SWAP(u,u0); SWAP(v,v0);
-     diffuse(1,u,u0);
-     diffuse(2,v,v0);
-     SWAP(u,u0); SWAP(v,v0);
-     advect(1,u,u0,u0,v0);
-     advect(2,v,v0,u0,v0);
-
-     project(u,v,u0,v0);
-     */
     add_source(u, u0); add_source(v, v0);
     diffuse(1, u0, u, visc);
     diffuse(2, v0, v, visc);

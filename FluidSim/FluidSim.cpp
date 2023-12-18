@@ -10,7 +10,7 @@ int main()
     InitWindow(screenWidth,screenHeight, "My Fluid Sim :)");
     RenderTexture2D Canvas = LoadRenderTexture(screenWidth, screenHeight);
     SetTargetFPS(60);
-    Fluid MyFluid(0.025f,2,0);
+    Fluid MyFluid(0.25f,2,0);
 
     Vector2 pmouse = GetMousePosition();
     Vector2 mouse = GetMousePosition();
@@ -22,7 +22,7 @@ int main()
         
         BeginTextureMode(Canvas);
             MyFluid.renderDensity();
-            MyFluid.renderVelocity();
+            //MyFluid.renderVelocity();
         EndTextureMode();
         
         BeginDrawing();
@@ -36,7 +36,7 @@ int main()
         */
 
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-            MyFluid.addDensity(mouse.x / SCALE, (mouse.y) / SCALE, 15);
+            MyFluid.addDensity(mouse.x / SCALE, (mouse.y) / SCALE, 125);
             float amntX = mouse.x - pmouse.x;
             float amntY = (screenHeight-mouse.y) - (screenHeight-pmouse.y);
             MyFluid.addVelocity(mouse.x / SCALE, (screenHeight-mouse.y) / SCALE, amntX, amntY);

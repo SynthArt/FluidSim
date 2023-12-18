@@ -15,6 +15,15 @@ const T& constrain(const T& x, const T& a, const T& b) {
         return x;
 }
 
+int map(float input, float inputStart, float inputEnd, int outputStart, int outputEnd ) {
+    float slopeDenom = (inputEnd - inputStart);
+    float slope = 0;
+    if (slopeDenom != 0)
+        slope = (outputEnd - outputStart) / slopeDenom;
+    int output = outputStart + slope * (input - inputStart);
+    return output;
+}
+
 Fluid::Fluid(float dt, float diffusion, float viscosity) {
     this->dt = dt;
     this->diff = diffusion;
@@ -39,12 +48,6 @@ void Fluid::addDensity(int x, int y, float dValue) {
     if (x >= N || y >= N || x < 0 || y < 0)
         return;
     this->density[TI(x)][TI(y)] += dValue;
-    float val = this->density[x][y];
-    if (val < 0)
-        this->density[x][y] = 0;
-    if (val > 255)
-        this->density[x][y] = 255;   
-    //std::cout << this->density[x][y] << std::endl;
 }
 
 void Fluid::addVelocity(int x, int y, float amntX, float amntY) {
@@ -59,10 +62,14 @@ void Fluid::renderDensity() {
         float x = i * SCALE;
         for (int j = 0; j < N; j++) {
             float y = j * SCALE;
+            
             float densityValue = this->density[TI(i)][TI(j)];
-            Color densityClr = {0, densityValue, densityValue, 255};
-            //if(this->density[i][j] > 0)
-                //std::cout << this->density[i][j] << std::endl;
+            if (densityValue < 0)
+                densityValue = 0;
+            if (densityValue > 255)
+                densityValue = 255;
+           
+            Color densityClr = { 0, densityValue, densityValue, 255 };
             DrawRectangle(x,GetScreenWidth()-y,SCALE,SCALE,densityClr);
         }
     }
@@ -82,14 +89,14 @@ void Fluid::renderVelocity() {
     }
 }
 
-void Fluid::add_source(std::vector<std::vector<float>> x, std::vector<std::vector<float>> b) {
+void Fluid::add_source(std::vector<std::vector<float>> &x, const std::vector<std::vector<float>> &b) {
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++)
             x[TI(i)][TI(j)] += dt * b[TI(i)][TI(j)];
     }
 }
 
-void Fluid::set_bnd(int b, std::vector<std::vector<float>> x) {
+void Fluid::set_bnd(int b, std::vector<std::vector<float>> &x) {
     for (int i = 1; i < N - 1; i++) {
 
         x[0][TI(i)] = (b == 1 ? -x[1][TI(i)] : x[1][TI(i)]);
@@ -106,7 +113,7 @@ void Fluid::set_bnd(int b, std::vector<std::vector<float>> x) {
     x[TI(N - 1)][TI(N - 1)] = 0.5f * (x[TI(N - 2)][TI(N - 1)] + x[TI(N - 1)][TI(N - 2)]);
 }
 
-void Fluid::lin_solve(int B, std::vector<std::vector<float>> x, std::vector<std::vector<float>> b, float a, float c) {
+void Fluid::lin_solve(int B, std::vector<std::vector<float>> &x, const std::vector<std::vector<float>> &b, float a, float c) {
     int i, j, iter;
     // x is the initial density
     // b is the previous density step
@@ -114,6 +121,7 @@ void Fluid::lin_solve(int B, std::vector<std::vector<float>> x, std::vector<std:
         for (i = 1; i < N - 1; i++) {
             for (j = 1; j < N - 1; j++) {
                 x[TI(i)][TI(j)] = (b[TI(i)][TI(j)] + a * (x[TI(i + 1)][TI(j)] + x[TI(i - 1)][TI(j)] + x[TI(i)][TI(j + 1)] + x[TI(i)][TI(j - 1)])) / c;
+                //if(x[i][j] > 0) printf("ADVECT FLAG %f \n", x[i][j]);
                 // pseudo code below v
                 //denseNext[i,j] = ( densityInitial[i,j] + k * (densityInitial[i+1,j] + densityInitial[i-1,j] + densityInitial[i,j+1] + densityInitial[i,j-1]) ) / (1 + k);
             }
@@ -122,15 +130,18 @@ void Fluid::lin_solve(int B, std::vector<std::vector<float>> x, std::vector<std:
     }
 }
 
-void Fluid::diffuse(int b, std::vector<std::vector<float>> dens, std::vector<std::vector<float>> dens0, float dFactor) {
+void Fluid::diffuse(int b, std::vector<std::vector<float>> &dens, const std::vector<std::vector<float>> &dens0, float dFactor) {
     float k = dt * dFactor * pow(SCALE, -2);
     lin_solve(b, dens, dens0, k, 1 + 4 * k);
+    //printf("DIFFUSE FLAG: %f \n", k);
 }
 
-void Fluid::advect(int b, std::vector<std::vector<float>> dens, std::vector<std::vector<float>> dens0, std::vector<std::vector<float>> u, std::vector<std::vector<float>> v) {
+void Fluid::advect(int b, std::vector<std::vector<float>> &dens, const std::vector<std::vector<float>> &dens0, const std::vector<std::vector<float>> &u, const std::vector<std::vector<float>> &v) {
     int i, j, i0, j0, i1, j1;
     float x, y, s0, t0, s1, t1, dt0;
     dt0 = dt * pow(SCALE, 2); // advection rate
+    //printf("Advection rate: %f ",dt0);
+    
     for (i = 1; i < N - 1; i++) {
         for (j = 1; j < N - 1; j++) { // flag: making this to N-2 diffuses velocity field at normal rate but causes boundary issues
             // backtrace the position to the previous cell
@@ -149,12 +160,13 @@ void Fluid::advect(int b, std::vector<std::vector<float>> dens, std::vector<std:
 
             dens[TI(i)][TI(j)] = s0 * (t0 * dens0[TI(i0)][TI(j0)] + t1 * dens0[TI(i0)][TI(j1)])
                 + s1 * (t0 * dens0[TI(i1)][TI(j0)] + t1 * dens0[TI(i1)][TI(j1)]);
+
         }
     }
     set_bnd(b, dens);
 }
 
-void Fluid::project(std::vector<std::vector<float>> u, std::vector<std::vector<float>> v, std::vector<std::vector<float>> div, std::vector<std::vector<float>> p) {
+void Fluid::project(std::vector<std::vector<float>> &u, std::vector<std::vector<float>> &v, std::vector<std::vector<float>> &div, std::vector<std::vector<float>> &p) {
     // compute divergence
     for (int i = 1; i < N - 1; i++) {
         for (int j = 1; j < N - 1; j++) {

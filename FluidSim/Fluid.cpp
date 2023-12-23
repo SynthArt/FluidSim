@@ -2,6 +2,9 @@
 #include <algorithm> 
 #include <iostream>
 
+const int N = 128;
+const int SCALE = 6;
+const int G = 8;
 
 template<class T>
 const T& constrain(const T& x, const T& a, const T& b) {
@@ -46,7 +49,7 @@ void Fluid::fadeD() {
 void Fluid::addDensity(int x, int y, float dValue) {
     if (x >= N || y >= N || x < 0 || y < 0)
         return;
-    this->density[TI(x)][TI(y)] += dValue;
+    this->density[x][y] += dValue;
 }
 
 void Fluid::addVelocity(int x, int y, float amntX, float amntY) {
@@ -62,7 +65,7 @@ void Fluid::renderDensity() {
         for (int j = 0; j < N; j++) {
             float y = j * SCALE;
             
-            float densityValue = this->density[TI(i)][TI(j)];
+            float densityValue = this->density[i][j];
             if (densityValue < 0)
                 densityValue = 0;
             if (densityValue > 255)
@@ -79,8 +82,8 @@ void Fluid::renderVelocity() {
         for (int j = 0; j < N; j++) {
             float x = i * SCALE;
             float y = j * SCALE;
-            float vx = this->u[TI(i)][TI(j)];
-            float vy = this->v[TI(i)][TI(j)];
+            float vx = this->u[i][j];
+            float vy = this->v[i][j];
             if (!(abs(vx) < 0.1f && abs(vy) <= 0.1f)) {
                 DrawLine(x, y, x + vx * SCALE, y + vy * SCALE, {255,255,255,255} );
             }
@@ -91,35 +94,38 @@ void Fluid::renderVelocity() {
 void Fluid::add_source(std::vector<std::vector<float>> &x, const std::vector<std::vector<float>> &b) {
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++)
-            x[TI(i)][TI(j)] += dt * b[TI(i)][TI(j)];
+            x[i][j] += dt * b[i][j];
     }
 }
 
 void Fluid::set_bnd(int b, std::vector<std::vector<float>> &x) {
     for (int i = 1; i < N - 1; i++) {
 
-        x[0][TI(i)] = (b == 1 ? -x[1][TI(i)] : x[1][TI(i)]);
+        x[0][i] = (b == 1 ? -x[1][i] : x[1][i]);
 
-        x[TI(N - 1)][TI(i)] = (b == 1 ? -x[TI(N - 2)][TI(i)] : x[TI(N - 2)][TI(i)]);
+        x[N - 1][i] = (b == 1 ? -x[N - 2][i] : x[N - 2][i]);
 
-        x[TI(i)][0] = (b == 2 ? -x[TI(i)][1] : x[TI(i)][1]);
+        x[i][0] = (b == 2 ? -x[i][1] : x[i][1]);
 
-        x[TI(i)][TI(N - 1)] = (b == 2 ? -x[TI(i)][TI(N - 2)] : x[TI(i)][TI(N - 2)]);
+        x[i][N - 1] = (b == 2 ? -x[i][N - 2] : x[i][N - 2]);
     }
     x[0][0] = 0.5f * (x[1][0] + x[0][1]);
-    x[0][TI(N - 1)] = 0.5f * (x[1][TI(N - 1)] + x[0][TI(N - 2)]);
-    x[TI(N - 1)][0] = 0.5f * (x[TI(N - 2)][0] + x[TI(N - 1)][1]);
-    x[TI(N - 1)][TI(N - 1)] = 0.5f * (x[TI(N - 2)][TI(N - 1)] + x[TI(N - 1)][TI(N - 2)]);
+    x[0][N - 1] = 0.5f * (x[1][N - 1] + x[0][N - 2]);
+    x[N - 1][0] = 0.5f * (x[N - 2][0] + x[N - 1][1]);
+    x[N - 1][N - 1] = 0.5f * (x[N - 2][N - 1] + x[N - 1][N - 2]);
 }
 
 void Fluid::lin_solve(int B, std::vector<std::vector<float>> &x, const std::vector<std::vector<float>> &b, float a, float c) {
     int i, j, iter;
     // x is the initial density
     // b is the previous density step
-    for (iter = 0; iter < g; iter++) {
+    const float inverseC = 1.f / c;
+    const float aTimesC = a * inverseC;
+    for (iter = 0; iter < G; iter++) {
         for (i = 1; i < N - 1; i++) {
             for (j = 1; j < N - 1; j++) {
-                x[TI(i)][TI(j)] = (b[TI(i)][TI(j)] + a * (x[TI(i + 1)][TI(j)] + x[TI(i - 1)][TI(j)] + x[TI(i)][TI(j + 1)] + x[TI(i)][TI(j - 1)])) / c;
+                float neighborSum = x[i + 1][j] + x[i - 1][j] + x[i][j + 1] + x[i][j - 1];
+                x[i][j] = (b[i][j] + aTimesC * neighborSum) * inverseC;
             }
         }
         set_bnd(B, x);
@@ -128,32 +134,35 @@ void Fluid::lin_solve(int B, std::vector<std::vector<float>> &x, const std::vect
 
 void Fluid::diffuse(int b, std::vector<std::vector<float>> &dens, const std::vector<std::vector<float>> &dens0, float dFactor) {
     float k = dt * dFactor * pow(SCALE, -2);
-    lin_solve(b, dens, dens0, k, 1 + 4 * k);
+    lin_solve(b, dens, dens0, k, 1.0f + 4.0f * k);
 }
 
 void Fluid::advect(int b, std::vector<std::vector<float>> &dens, const std::vector<std::vector<float>> &dens0, const std::vector<std::vector<float>> &u, const std::vector<std::vector<float>> &v) {
     int i, j, i0, j0, i1, j1;
-    float x, y, s0, t0, s1, t1, dt0;
-    dt0 = dt * pow(SCALE, 2); // advection rate
-    
+    float x, y, s0, t0, s1, t1;
+    const float dt0 = dt * (SCALE * SCALE); // advection rate
+    const float NMinus2Half = (N - 2) + 0.5f;
+
+
     for (i = 1; i < N - 1; i++) {
+
         for (j = 1; j < N - 1; j++) { // flag: making this to N-2 diffuses velocity field at normal rate but causes boundary issues
             // backtrace the position to the previous cell
-            x = i - dt0 * u[TI(i)][TI(j)];
-            y = j - dt0 * v[TI(i)][TI(j)];
+            x = i - dt0 * u[i][j];
+            y = j - dt0 * v[i][j];
             // clamp the position to the center of each cell
-            if (x < 0.5) x = 0.5; if (x > (N - 2) + 0.5) x = (N - 2) + 0.5;
-            if (y < 0.5) y = 0.5; if (y > (N - 2) + 0.5) y = (N - 2) + 0.5;
+            if (x < 0.5f) x = 0.5f; if (x > NMinus2Half) x = NMinus2Half;
+            if (y < 0.5f) y = 0.5f; if (y > NMinus2Half) y = NMinus2Half;
             // current cell's center
-            i0 = (int)x; j0 = (int)y;
+            i0 = floor(x); j0 = floor(y);
             // cell's neighbor
             i1 = i0 + 1; j1 = j0 + 1;
             // offsets from center
-            s1 = x - i0; s0 = 1 - s1;
-            t1 = y - j0; t0 = 1 - t1;
+            s1 = x - i0; s0 = 1.f - s1;
+            t1 = y - j0; t0 = 1.f - t1;
 
-            dens[TI(i)][TI(j)] = s0 * (t0 * dens0[TI(i0)][TI(j0)] + t1 * dens0[TI(i0)][TI(j1)])
-                + s1 * (t0 * dens0[TI(i1)][TI(j0)] + t1 * dens0[TI(i1)][TI(j1)]);
+            dens[i][j] = s0 * (t0 * dens0[i0][j0] + t1 * dens0[i0][j1])
+                + s1 * (t0 * dens0[i1][j0] + t1 * dens0[i1][j1]);
 
         }
     }
@@ -161,13 +170,16 @@ void Fluid::advect(int b, std::vector<std::vector<float>> &dens, const std::vect
 }
 
 void Fluid::project(std::vector<std::vector<float>> &u, std::vector<std::vector<float>> &v, std::vector<std::vector<float>> &div, std::vector<std::vector<float>> &p) {
+    const float scaleCoeff = 0.5f * SCALE;
     // compute divergence
     for (int i = 1; i < N - 1; i++) {
         for (int j = 1; j < N - 1; j++) {
             // poisson equation; also note that div would ideally equal 0
-            div[TI(i)][TI(j)] = -0.5 * (u[TI(i + 1)][TI(j)] - u[TI(i - 1)][TI(j)]
-                + v[TI(i)][TI(j + 1)] - v[TI(i)][TI(j - 1)]) / SCALE;
-            p[TI(i)][TI(j)] = 0.0;
+            float du = u[i + 1][j] - u[i - 1][j];
+            float dv = v[i][j + 1] - v[i][j - 1];
+
+            div[i][j] = -0.5f * (du + dv) / SCALE;
+            p[i][j] = 0.f;
         }
     }
     set_bnd(0, div); set_bnd(0, p);
@@ -176,8 +188,8 @@ void Fluid::project(std::vector<std::vector<float>> &u, std::vector<std::vector<
     // subtract gradient field
     for (int i = 1; i < N - 1; i++) {
         for (int j = 1; j < N - 1; j++) {
-            u[TI(i)][TI(j)] -= 0.5 * SCALE * (p[TI(i + 1)][TI(j)] - p[TI(i - 1)][TI(j)]);
-            v[TI(i)][TI(j)] -= 0.5 * SCALE * (p[TI(i)][TI(j + 1)] - p[TI(i - 1)][TI(j - 1)]);
+            u[i][j] -= scaleCoeff * (p[i + 1][j] - p[i - 1][j]);
+            v[i][j] -= scaleCoeff * (p[i][j + 1] - p[i - 1][j - 1]);
         }
     }
     set_bnd(1, u); set_bnd(2, v);
@@ -220,21 +232,4 @@ void Fluid::advect_step() {
     project(u, v, u0, v0);
 }
 
-void Fluid::SWAP(std::vector<std::vector<float>> x0, std::vector<std::vector<float>> x) {
-    x0.swap(x);
-    /*
-    float temp[N][N];
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; j++) {
-            temp[i][j] = *x0[i][j];
-            *x0[i][j] = *x[i][j];
-            *x[i][j] = temp[i][j];
-        }
-    }
-    */
-}
 
-int Fluid::TI(int index)
-{
-    return index;
-}

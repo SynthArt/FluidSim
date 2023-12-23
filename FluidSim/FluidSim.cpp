@@ -9,8 +9,8 @@ int main()
     const int screenHeight = N*SCALE;
     InitWindow(screenWidth,screenHeight, "My Fluid Sim :)");
     RenderTexture2D Canvas = LoadRenderTexture(screenWidth, screenHeight);
-    SetTargetFPS(30);
-    Fluid MyFluid(0.025f,6.0f,0);
+    SetTargetFPS(40);
+    Fluid MyFluid(0.025f,2.0f,0);
 
     Vector2 pmouse = GetMousePosition();
     Vector2 mouse = GetMousePosition();
@@ -19,6 +19,7 @@ int main()
         pmouse = mouse;
         mouse = GetMousePosition();
         printf("FPS: %i \n", GetFPS());
+        
         MyFluid.step();
         
         BeginTextureMode(Canvas);
@@ -30,11 +31,12 @@ int main()
         Rectangle source = { 0, 0, (float)Canvas.texture.width, (float)-Canvas.texture.height };
         DrawTextureRec(Canvas.texture, source, { 0,0 }, WHITE);
         EndDrawing();
+        
 
         /*
         int rectX = (screenWidth / 2) / SCALE;
         int rectY = (screenHeight /2) / SCALE;
-        MyFluid.addDensity(rectX, rectY, 1000);
+        MyFluid.addDensity(rectX, rectY, 500);
         MyFluid.addVelocity(rectX,rectY, 0,75);
         */
         ///*
@@ -50,13 +52,3 @@ int main()
     return 0;
 }
 
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file

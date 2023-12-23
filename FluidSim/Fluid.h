@@ -2,10 +2,9 @@
 #include <vector>
 #include <raylib.h>
 
-#define N 128
-#define SCALE 6
-#define g 16
-
+extern const int N; // 128
+extern const int SCALE; // 6
+extern const int G; // 12
 
 class Fluid {
 	float dt;
@@ -54,7 +53,4 @@ class Fluid {
 
 	void advect_step();
 
-	void SWAP(std::vector<std::vector<float>> x0, std::vector<std::vector<float>> x);
-
-	int TI(int index);
 };

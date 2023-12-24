@@ -4,7 +4,7 @@
 
 const int N = 128;
 const int SCALE = 6;
-const int G = 8;
+const int G = 16;
 
 template<class T>
 const T& constrain(const T& x, const T& a, const T& b) {

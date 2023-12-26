@@ -10,7 +10,9 @@ int main()
     InitWindow(screenWidth,screenHeight, "My Fluid Sim :)");
     RenderTexture2D Canvas = LoadRenderTexture(screenWidth, screenHeight);
     SetTargetFPS(160);
-    Fluid MyFluid(0.025f,2.0f,0);
+    //0.03125f - 3.5f
+
+    Fluid MyFluid(0.03125f,3.5f,0);
 
     Vector2 pmouse = GetMousePosition();
     Vector2 mouse = GetMousePosition();
@@ -21,7 +23,7 @@ int main()
         printf("FPS: %i \n", GetFPS());
         
         MyFluid.step();
-        MyFluid.fadeD();
+        //MyFluid.fadeD();
 
         BeginTextureMode(Canvas);
             MyFluid.renderDensity();
@@ -34,10 +36,10 @@ int main()
         EndDrawing();
         
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-            MyFluid.addDensity(mouse.x / SCALE, mouse.y / SCALE, 500);
+            MyFluid.addDensity((int)(mouse.x / SCALE), (int)(mouse.y / SCALE), 500);
             float amntX = mouse.x - pmouse.x;
             float amntY = mouse.y - pmouse.y;
-            MyFluid.addVelocity(mouse.x / SCALE, mouse.y / SCALE, amntX, amntY);
+            MyFluid.addVelocity((int)(mouse.x / SCALE), (int)(mouse.y / SCALE), amntX, amntY);
         }
     }
     CloseWindow();

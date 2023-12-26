@@ -1,27 +1,19 @@
 ﻿  Fluid.cpp
 C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\Fluid.cpp(26,16): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
-C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\Fluid.cpp(64,17): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
-C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\Fluid.cpp(66,21): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
 C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\Fluid.cpp(74,37): warning C4838: conversion from 'float' to 'unsigned char' requires a narrowing conversion
 C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\Fluid.cpp(74,37): warning C4244: 'initializing': conversion from 'float' to 'unsigned char', possible loss of data
 C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\Fluid.cpp(74,51): warning C4838: conversion from 'float' to 'unsigned char' requires a narrowing conversion
 C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\Fluid.cpp(74,51): warning C4244: 'initializing': conversion from 'float' to 'unsigned char', possible loss of data
-C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\Fluid.cpp(75,29): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\Fluid.cpp(75,27): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
 C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\Fluid.cpp(83,21): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
 C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\Fluid.cpp(84,21): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
 C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\Fluid.cpp(88,50): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
 C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\Fluid.cpp(88,34): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
 C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\Fluid.cpp(88,29): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
 C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\Fluid.cpp(88,26): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\Fluid.cpp(136,13): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
 C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\Fluid.cpp(157,23): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
 C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\Fluid.cpp(157,38): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
   FluidSim.cpp
-C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\FluidSim.cpp(44,57): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\FluidSim.cpp(44,40): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\FluidSim.cpp(47,58): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\FluidSim.cpp(47,41): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+  Running Code Analysis for C/C++...
   Generating Code...
 LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
   FluidSim.vcxproj -> C:\Users\alla0\Documents\GitHub\FluidSim\x64\Debug\FluidSim.exe

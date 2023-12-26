@@ -35,7 +35,7 @@ class Fluid {
 	
 	void lin_solve(int B, std::vector<std::vector<float>>& x, const std::vector<std::vector<float>>& b, float a, float c);
 	
-	void add_source(std::vector<std::vector<float>>& x, const std::vector<std::vector<float>>& b);
+	void add_source(std::vector<std::vector<float>>& x, const std::vector<std::vector<float>>& b) const;
 
 	void diffuse(int b, std::vector<std::vector<float>> &dens, const std::vector<std::vector<float>> &dens0, float dFactor);
 

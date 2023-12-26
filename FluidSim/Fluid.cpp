@@ -18,7 +18,7 @@ const T& constrain(const T& x, const T& a, const T& b) {
         return x;
 }
 
-int map(float input, float inputStart, float inputEnd, int outputStart, int outputEnd ) {
+static int map(float input, float inputStart, float inputEnd, int outputStart, int outputEnd ) {
     float slopeDenom = (inputEnd - inputStart);
     float slope = 0;
     if (slopeDenom != 0)
@@ -61,9 +61,9 @@ void Fluid::addVelocity(int x, int y, float amntX, float amntY) {
 
 void Fluid::renderDensity() {
     for (int i = 0; i < N; i++) {
-        float x = i * SCALE;
+        int x = i * SCALE;
         for (int j = 0; j < N; j++) {
-            float y = j * SCALE;
+            int y = j * SCALE;
             
             float densityValue = this->density[i][j];
             if (densityValue < 0)
@@ -91,7 +91,7 @@ void Fluid::renderVelocity() {
     }
 }
 
-void Fluid::add_source(std::vector<std::vector<float>> &x, const std::vector<std::vector<float>> &b) {
+void Fluid:: add_source(std::vector<std::vector<float>> &x, const std::vector<std::vector<float>> &b) const {
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++)
             x[i][j] += dt * b[i][j];
@@ -116,6 +116,7 @@ void Fluid::set_bnd(int b, std::vector<std::vector<float>> &x) {
 }
 
 void Fluid::lin_solve(int B, std::vector<std::vector<float>> &x, const std::vector<std::vector<float>> &b, float a, float c) {
+    // assumes the boundaries are rectangle; TODO: change to a more general bounding using boolean grid
     int i, j, iter;
     // x is the initial density
     // b is the previous density step
@@ -133,8 +134,8 @@ void Fluid::lin_solve(int B, std::vector<std::vector<float>> &x, const std::vect
 }
 
 void Fluid::diffuse(int b, std::vector<std::vector<float>> &dens, const std::vector<std::vector<float>> &dens0, float dFactor) {
-    float k = dt * dFactor * pow(SCALE, -2);
-    lin_solve(b, dens, dens0, k, 1.0f + 4.0f * k);
+    float k = dt * dFactor * (1.f/(SCALE*SCALE));
+    lin_solve(b, dens, dens0, k, 1.f + 5.f * k);
 }
 
 void Fluid::advect(int b, std::vector<std::vector<float>> &dens, const std::vector<std::vector<float>> &dens0, const std::vector<std::vector<float>> &u, const std::vector<std::vector<float>> &v) {
@@ -142,7 +143,6 @@ void Fluid::advect(int b, std::vector<std::vector<float>> &dens, const std::vect
     float x, y, s0, t0, s1, t1;
     const float dt0 = dt * (SCALE * SCALE); // advection rate
     const float NMinus2Half = (N - 2) + 0.5f;
-
 
     for (i = 1; i < N - 1; i++) {
 
@@ -220,7 +220,7 @@ void Fluid::dens_step() {
 }
 
 void Fluid::advect_step() {
-    add_source(u, u0); add_source(v, v0);
+    add_source(u0,u); add_source(v0,v);
     diffuse(1, u0, u, visc);
     diffuse(2, v0, v, visc);
 

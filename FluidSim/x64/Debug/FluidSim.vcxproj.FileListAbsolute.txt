@@ -1,2 +1,0 @@
-C:\Users\alla0\Documents\GitHub\FluidSim\x64\Debug\FluidSim.exe.lastcodeanalysissucceeded
-C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\x64\Debug\NativeCodeAnalysis.read.1.tlog

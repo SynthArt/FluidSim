@@ -16,6 +16,7 @@ class Fluid {
 	std::vector<std::vector<float>> v;			std::vector<std::vector<float>> u;
 	std::vector<std::vector<float>> v0;			std::vector<std::vector<float>> u0;
 
+	std::vector<std::vector<bool>> walls;
 	std::vector<std::vector<float>> bf; // body forces - not working correctly
 	
 	public:
@@ -23,15 +24,19 @@ class Fluid {
 
 	void fadeD();
 
+	void addWall(int x, int y);
+
 	void addDensity(int x, int y, float dValue);
 
 	void addVelocity(int x, int y, float amntX, float amntY);
 
-	void renderDensity();
+	void render(); // renders Density and Walls
 
 	void renderVelocity();
 
-	void set_bnd(int b, std::vector<std::vector<float>>& x);
+	//void set_bnd(int b, std::vector<std::vector<float>>& x);
+
+	void applyBounds(std::vector<std::vector<float>>& x);
 	
 	void lin_solve(int B, std::vector<std::vector<float>>& x, const std::vector<std::vector<float>>& b, float a, float c);
 	
@@ -44,6 +49,8 @@ class Fluid {
 
 	void project(std::vector<std::vector<float>> &u, std::vector<std::vector<float>> &v, 
 		std::vector<std::vector<float>> &div, std::vector<std::vector<float>> &p);
+
+	void updateDeltaTime(float dt);
 
 	void step();
 

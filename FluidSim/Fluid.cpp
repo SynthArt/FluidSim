@@ -36,7 +36,18 @@ Fluid::Fluid(float dt, float diffusion, float viscosity) {
     density.resize(N, std::vector<float>(N));  s.resize(N, std::vector<float>(N));
     v.resize(N, std::vector<float>(N));        u.resize(N, std::vector<float>(N));
     v0.resize(N, std::vector<float>(N));       u0.resize(N, std::vector<float>(N));
-    bf.resize(N, std::vector<float>(N));
+    bf.resize(N, std::vector<float>(N));       walls.resize(N, std::vector<bool>(N));
+
+    // initialize outer boundaries
+    for (int i = 0; i < walls.size(); i++) {
+        walls[i][0] = 1;
+        walls[i][N - 1] = 1;
+    }
+
+    for (int j = 0; j < walls[0].size(); j++) {
+        walls[0][j] = 1;
+        walls[N - 1][j] = 1;
+    }
 }
 
 void Fluid::fadeD() {
@@ -44,6 +55,10 @@ void Fluid::fadeD() {
         for (int y = 0; y < N; y++)
             // fade the grid so we can keep drawing but be considerate of delta time or the spatial time step
             this->density[x][y] = constrain(this->density[x][y] - 1 * 0.125f, 0.f, 255.f);
+}
+
+void Fluid::addWall(int x, int y) {
+    walls[x][y] = 1;
 }
 
 void Fluid::addDensity(int x, int y, float dValue) {
@@ -59,7 +74,7 @@ void Fluid::addVelocity(int x, int y, float amntX, float amntY) {
     this->v[x][y] += amntY;
 }
 
-void Fluid::renderDensity() {
+void Fluid::render() {
     for (int i = 0; i < N; i++) {
         int x = i * SCALE;
         for (int j = 0; j < N; j++) {
@@ -71,7 +86,7 @@ void Fluid::renderDensity() {
             if (densityValue > 255)
                 densityValue = 255;
            
-            Color densityClr = { 0, densityValue, densityValue, 255 };
+            Color densityClr = { 255 * walls[i][j], densityValue, densityValue, 255};
             DrawRectangle(x,y,SCALE,SCALE,densityClr);
         }
     }
@@ -98,21 +113,27 @@ void Fluid:: add_source(std::vector<std::vector<float>> &x, const std::vector<st
     }
 }
 
-void Fluid::set_bnd(int b, std::vector<std::vector<float>> &x) {
-    for (int i = 1; i < N - 1; i++) {
-
-        x[0][i] = (b == 1 ? -x[1][i] : x[1][i]);
-
-        x[N - 1][i] = (b == 1 ? -x[N - 2][i] : x[N - 2][i]);
-
-        x[i][0] = (b == 2 ? -x[i][1] : x[i][1]);
-
-        x[i][N - 1] = (b == 2 ? -x[i][N - 2] : x[i][N - 2]);
+void Fluid::applyBounds(std::vector<std::vector<float>>& x) {
+// Free-Slip Condition
+    for (int i = 0; i < walls.size(); i++) {
+        if (walls[i][0] == 1)   x[i][0] = 0.f;
+        if (walls[i][walls[0].size()-1] == 1)   x[i][walls[0].size()-1] = 0.f;
     }
-    x[0][0] = 0.5f * (x[1][0] + x[0][1]);
-    x[0][N - 1] = 0.5f * (x[1][N - 1] + x[0][N - 2]);
-    x[N - 1][0] = 0.5f * (x[N - 2][0] + x[N - 1][1]);
-    x[N - 1][N - 1] = 0.5f * (x[N - 2][N - 1] + x[N - 1][N - 2]);
+
+    for (int j = 0; j < walls[0].size(); j++) {
+        if (walls[0][j] == 1)   x[0][j] = 0.f;
+        if (walls[walls.size() - 1][j] == 1)   x[walls.size() - 1][j] = 0.f;
+    }
+    
+    for (int i = 1; i < N-1; i++) {
+        for (int j = 1; j < N-1; j++) {
+            if (walls[i][j] == 1) {
+                // Solid boundary cell
+                //x[i][j + 1] = 0.0f;  // Set normal velocity to zero
+                x[i][j] = 0.0f;      // Set tangential velocity to zero
+            }
+        }
+    }
 }
 
 void Fluid::lin_solve(int B, std::vector<std::vector<float>> &x, const std::vector<std::vector<float>> &b, float a, float c) {
@@ -129,7 +150,7 @@ void Fluid::lin_solve(int B, std::vector<std::vector<float>> &x, const std::vect
                 x[i][j] = (b[i][j] + aTimesC * neighborSum) * inverseC;
             }
         }
-        set_bnd(B, x);
+        applyBounds(x);
     }
 }
 
@@ -166,7 +187,7 @@ void Fluid::advect(int b, std::vector<std::vector<float>> &dens, const std::vect
 
         }
     }
-    set_bnd(b, dens);
+    applyBounds(dens);
 }
 
 void Fluid::project(std::vector<std::vector<float>> &u, std::vector<std::vector<float>> &v, std::vector<std::vector<float>> &div, std::vector<std::vector<float>> &p) {
@@ -182,7 +203,7 @@ void Fluid::project(std::vector<std::vector<float>> &u, std::vector<std::vector<
             p[i][j] = 0.f;
         }
     }
-    set_bnd(0, div); set_bnd(0, p);
+    applyBounds(div); applyBounds(p);
     // solve poisson equation
     lin_solve(0, p, div, 1, 6);
     // subtract gradient field
@@ -192,7 +213,11 @@ void Fluid::project(std::vector<std::vector<float>> &u, std::vector<std::vector<
             v[i][j] -= scaleCoeff * (p[i][j + 1] - p[i - 1][j - 1]);
         }
     }
-    set_bnd(1, u); set_bnd(2, v);
+    applyBounds(u); applyBounds(v);
+}
+
+void Fluid::updateDeltaTime(float dt) {
+    this->dt = dt;
 }
 
 void Fluid::step() {
@@ -204,13 +229,15 @@ void Fluid::step() {
 
 void Fluid::forces_step() {
     /* gravity body force */
+    //float timeStep = dt * (1.f / (SCALE * SCALE));
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
-            v0[i][j] += 9.81f / (SCALE * SCALE);
+            v0[i][j] += 9.81f * (1/(SCALE*SCALE));
             u0[i][j] *= 0.0f;
             //bf[i][j] = 9.81/(SCALE*1);
         }
     }
+    applyBounds(v); applyBounds(u);
 }
 
 void Fluid::dens_step() {
@@ -220,7 +247,7 @@ void Fluid::dens_step() {
 }
 
 void Fluid::advect_step() {
-    add_source(u0,u); add_source(v0,v);
+    add_source(u,u0); add_source(v,v0);
     diffuse(1, u0, u, visc);
     diffuse(2, v0, v, visc);
 

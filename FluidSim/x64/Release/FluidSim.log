@@ -14,8 +14,8 @@ C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\Fluid.cpp(94,26): warning C424
 C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\Fluid.cpp(169,23): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
 C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\Fluid.cpp(169,38): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
   Generating code
-  1 of 20 functions ( 5.0%) were compiled, the rest were copied from previous compilation.
+  3 of 20 functions (15.0%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    1 functions had inline decision re-evaluated but remain unchanged
+    0 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   FluidSim.vcxproj -> C:\Users\alla0\Documents\GitHub\FluidSim\x64\Release\FluidSim.exe

@@ -23,7 +23,8 @@ static int map(float input, float inputStart, float inputEnd, int outputStart, i
     return output;
 }
 
-Fluid::Fluid(float dt, float diffusion, float viscosity) {
+Fluid::Fluid(float dt, float diffusion, float viscosity) 
+    : density{ 0 }, s{ 0 }, v{ 0 }, u{ 0 }, v0{ 0 }, u0{ 0 }, walls{ 0 }, bf{ 0 } {
     this->dt = dt;
     this->diff = diffusion;
     this->visc = viscosity;
@@ -76,7 +77,6 @@ void Fluid::render() {
                 densityValue = 0;
             if (densityValue > 255)
                 densityValue = 255;
-           
             Color densityClr = { 255 * walls[i][j], densityValue, densityValue, 255};
             DrawRectangle(x,y,SCALE,SCALE,densityClr);
         }

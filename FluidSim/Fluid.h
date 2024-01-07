@@ -2,62 +2,42 @@
 #include <vector>
 #include <raylib.h>
 
-extern const int N; // 128
-extern const int SCALE; // 6
-extern const int G; // 12
+constexpr auto N = 128; // 128
+constexpr auto SCALE = 6; // 6
+constexpr auto G = 12; // 12
 
 class Fluid {
+private:
 	float dt;
 	float diff;
 	float visc;
 	float gridH;
+	float density[N][N]; float s[N][N];
+	float v[N][N]; float u[N][N];
+	float v0[N][N];	float u0[N][N];
 
-	std::vector<std::vector<float>> density;	std::vector<std::vector<float>> s;
-	std::vector<std::vector<float>> v;			std::vector<std::vector<float>> u;
-	std::vector<std::vector<float>> v0;			std::vector<std::vector<float>> u0;
+	bool walls[N][N];
+	float bf[N][N]; // body forces - not working correctly 
 
-	std::vector<std::vector<bool>> walls;
-	std::vector<std::vector<float>> bf; // body forces - not working correctly
-	
-	public:
-		Fluid(float dt, float diffusion, float viscosity);
-
-	void fadeD();
-
-	void addWall(int x, int y);
-
-	void addDensity(int x, int y, float dValue);
-
-	void addVelocity(int x, int y, float amntX, float amntY);
-
-	void render(); // renders Density and Walls
-
-	void renderVelocity();
-
-	//void set_bnd(int b, std::vector<std::vector<float>>& x);
-
-	void applyBounds(std::vector<std::vector<float>>& x);
-	
-	void lin_solve(int B, std::vector<std::vector<float>>& x, const std::vector<std::vector<float>>& b, float a, float c);
-	
-	void add_source(std::vector<std::vector<float>>& x, const std::vector<std::vector<float>>& b) const;
-
-	void diffuse(int b, std::vector<std::vector<float>> &dens, const std::vector<std::vector<float>> &dens0, float dFactor);
-
-	void advect(int b, std::vector<std::vector<float>> &dens, const std::vector<std::vector<float>> &dens0, 
-		const std::vector<std::vector<float>> &u, const std::vector<std::vector<float>> &v);
-
-	void project(std::vector<std::vector<float>> &u, std::vector<std::vector<float>> &v, 
-		std::vector<std::vector<float>> &div, std::vector<std::vector<float>> &p);
-
-	void updateDeltaTime(float dt);
-
-	void step();
+	void applyBounds(float (&x)[N][N]);
+	void lin_solve(int B, float (&x)[N][N], const float (&b)[N][N], float a, float c);
+	void add_source(float (&x)[N][N], const float (&b)[N][N]) const;
+	void diffuse(int b, float (&dens)[N][N], const float (&dens0)[N][N], float dFactor);
+	void advect(int b, float (&dens)[N][N], const float (&dens0)[N][N], const float (&u)[N][N], const float (&v)[N][N]);
+	void project(float (&u)[N][N], float (&v)[N][N], float (&div)[N][N], float (&p)[N][N]);
 
 	void forces_step();
-
 	void dens_step();
-
 	void advect_step();
 
+public:
+	Fluid(float dt, float diffusion, float viscosity);
+	void fadeD();
+	void addWall(int x, int y);
+	void addDensity(int x, int y, float dValue);
+	void addVelocity(int x, int y, float amntX, float amntY);
+	void render(); // renders Density and Walls
+	void renderVelocity();
+	void step();
+	void updateDeltaTime(float dt);
 };

@@ -2,10 +2,6 @@
 #include <algorithm> 
 #include <iostream>
 
-const int N = 128;
-const int SCALE = 6;
-const int G = 16;
-
 template<class T>
 const T& constrain(const T& x, const T& a, const T& b) {
     if (x < a) {
@@ -32,19 +28,14 @@ Fluid::Fluid(float dt, float diffusion, float viscosity) {
     this->diff = diffusion;
     this->visc = viscosity;
     this->gridH = SCALE;
-    //this.grvity = new float[N][N];
-    density.resize(N, std::vector<float>(N));  s.resize(N, std::vector<float>(N));
-    v.resize(N, std::vector<float>(N));        u.resize(N, std::vector<float>(N));
-    v0.resize(N, std::vector<float>(N));       u0.resize(N, std::vector<float>(N));
-    bf.resize(N, std::vector<float>(N));       walls.resize(N, std::vector<bool>(N));
 
     // initialize outer boundaries
-    for (int i = 0; i < walls.size(); i++) {
+    for (int i = 0; i < N; i++) {
         walls[i][0] = 1;
         walls[i][N - 1] = 1;
     }
 
-    for (int j = 0; j < walls[0].size(); j++) {
+    for (int j = 0; j < N; j++) {
         walls[0][j] = 1;
         walls[N - 1][j] = 1;
     }
@@ -64,14 +55,14 @@ void Fluid::addWall(int x, int y) {
 void Fluid::addDensity(int x, int y, float dValue) {
     if (x >= N || y >= N || x < 0 || y < 0)
         return;
-    this->density[x][y] += dValue;
+    density[x][y] += dValue;
 }
 
 void Fluid::addVelocity(int x, int y, float amntX, float amntY) {
     if (x >= N || y >= N || x < 0 || y < 0)
         return;
-    this->u[x][y] += amntX;
-    this->v[x][y] += amntY;
+    u[x][y] += amntX;
+    v[x][y] += amntY;
 }
 
 void Fluid::render() {
@@ -80,7 +71,7 @@ void Fluid::render() {
         for (int j = 0; j < N; j++) {
             int y = j * SCALE;
             
-            float densityValue = this->density[i][j];
+            float densityValue = density[i][j];
             if (densityValue < 0)
                 densityValue = 0;
             if (densityValue > 255)
@@ -106,23 +97,23 @@ void Fluid::renderVelocity() {
     }
 }
 
-void Fluid:: add_source(std::vector<std::vector<float>> &x, const std::vector<std::vector<float>> &b) const {
+void Fluid::add_source(float (&x)[N][N], const float (&b)[N][N]) const {
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++)
             x[i][j] += dt * b[i][j];
     }
 }
 
-void Fluid::applyBounds(std::vector<std::vector<float>>& x) {
+void Fluid::applyBounds(float (&x)[N][N]) {
 // Free-Slip Condition
-    for (int i = 0; i < walls.size(); i++) {
+    for (int i = 0; i < N; i++) {
         if (walls[i][0] == 1)   x[i][0] = 0.f;
-        if (walls[i][walls[0].size()-1] == 1)   x[i][walls[0].size()-1] = 0.f;
+        if (walls[i][N-1] == 1)   x[i][N-1] = 0.f;
     }
 
-    for (int j = 0; j < walls[0].size(); j++) {
+    for (int j = 0; j < N; j++) {
         if (walls[0][j] == 1)   x[0][j] = 0.f;
-        if (walls[walls.size() - 1][j] == 1)   x[walls.size() - 1][j] = 0.f;
+        if (walls[N - 1][j] == 1)   x[N - 1][j] = 0.f;
     }
     
     for (int i = 1; i < N-1; i++) {
@@ -136,7 +127,7 @@ void Fluid::applyBounds(std::vector<std::vector<float>>& x) {
     }
 }
 
-void Fluid::lin_solve(int B, std::vector<std::vector<float>> &x, const std::vector<std::vector<float>> &b, float a, float c) {
+void Fluid::lin_solve(int B, float (&x)[N][N], const float (&b)[N][N], float a, float c) {
     // assumes the boundaries are rectangle; TODO: change to a more general bounding using boolean grid
     int i, j, iter;
     // x is the initial density
@@ -154,12 +145,12 @@ void Fluid::lin_solve(int B, std::vector<std::vector<float>> &x, const std::vect
     }
 }
 
-void Fluid::diffuse(int b, std::vector<std::vector<float>> &dens, const std::vector<std::vector<float>> &dens0, float dFactor) {
+void Fluid::diffuse(int b, float (&dens)[N][N], const float (&dens0)[N][N], float dFactor) {
     float k = dt * dFactor * (1.f/(SCALE*SCALE));
     lin_solve(b, dens, dens0, k, 1.f + 5.f * k);
 }
 
-void Fluid::advect(int b, std::vector<std::vector<float>> &dens, const std::vector<std::vector<float>> &dens0, const std::vector<std::vector<float>> &u, const std::vector<std::vector<float>> &v) {
+void Fluid::advect(int b, float (&dens)[N][N], const float (&dens0)[N][N], const float (&u)[N][N], const float (&v)[N][N]) {
     int i, j, i0, j0, i1, j1;
     float x, y, s0, t0, s1, t1;
     const float dt0 = dt * (SCALE * SCALE); // advection rate
@@ -190,7 +181,7 @@ void Fluid::advect(int b, std::vector<std::vector<float>> &dens, const std::vect
     applyBounds(dens);
 }
 
-void Fluid::project(std::vector<std::vector<float>> &u, std::vector<std::vector<float>> &v, std::vector<std::vector<float>> &div, std::vector<std::vector<float>> &p) {
+void Fluid::project(float (&u)[N][N], float (&v)[N][N], float (&div)[N][N], float (&p)[N][N]) {
     const float scaleCoeff = 0.5f * SCALE;
     // compute divergence
     for (int i = 1; i < N - 1; i++) {
@@ -222,7 +213,7 @@ void Fluid::updateDeltaTime(float dt) {
 
 void Fluid::step() {
     // u is vx and v is vy
-    advect_step(); // CAUSING MAJOR LAG
+    advect_step(); 
     dens_step();
     //forces_step();
 }

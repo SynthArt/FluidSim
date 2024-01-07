@@ -9,7 +9,7 @@ int main()
     const int screenHeight = N*SCALE;
     InitWindow(screenWidth,screenHeight, "My Fluid Sim :)");
     RenderTexture2D Canvas = LoadRenderTexture(screenWidth, screenHeight);
-    SetTargetFPS(40);
+    SetTargetFPS(60);
     //0.03125f - 3.5f
 
     Fluid MyFluid(0.03125f,3.5f,0);

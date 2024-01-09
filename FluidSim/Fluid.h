@@ -17,9 +17,9 @@ private:
 	float v0[N][N];	float u0[N][N];
 
 	bool walls[N][N];
-	float bf[N][N]; // body forces - not working correctly 
+	//float bf[N][N]; // body forces - not working correctly 
 
-	void applyBounds(float (&x)[N][N]);
+	void applyBounds(float (&x)[N][N]) const;
 	void lin_solve(int B, float (&x)[N][N], const float (&b)[N][N], float a, float c);
 	void add_source(float (&x)[N][N], const float (&b)[N][N]) const;
 	void diffuse(int b, float (&dens)[N][N], const float (&dens0)[N][N], float dFactor);
@@ -36,8 +36,8 @@ public:
 	void addWall(int x, int y);
 	void addDensity(int x, int y, float dValue);
 	void addVelocity(int x, int y, float amntX, float amntY);
-	void render(); // renders Density and Walls
-	void renderVelocity();
+	void render() const; // renders Density and Walls
+	void renderVelocity() const;
 	void step();
 	void updateDeltaTime(float dt);
 };

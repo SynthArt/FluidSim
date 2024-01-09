@@ -1,20 +1,8 @@
-﻿  Fluid.cpp
-C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\Fluid.cpp(22,16): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
-C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\Fluid.cpp(80,38): warning C4838: conversion from 'int' to 'unsigned char' requires a narrowing conversion
-C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\Fluid.cpp(80,53): warning C4838: conversion from 'float' to 'unsigned char' requires a narrowing conversion
-C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\Fluid.cpp(80,53): warning C4244: 'initializing': conversion from 'float' to 'unsigned char', possible loss of data
-C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\Fluid.cpp(80,67): warning C4838: conversion from 'float' to 'unsigned char' requires a narrowing conversion
-C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\Fluid.cpp(80,67): warning C4244: 'initializing': conversion from 'float' to 'unsigned char', possible loss of data
-C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\Fluid.cpp(89,21): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
-C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\Fluid.cpp(90,21): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
-C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\Fluid.cpp(94,50): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\Fluid.cpp(94,34): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\Fluid.cpp(94,29): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\Fluid.cpp(94,26): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\Fluid.cpp(169,23): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\Fluid.cpp(169,38): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+﻿  FluidSim.cpp
+C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\FluidSim.cpp(8,20): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\FluidSim.cpp(8,59): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
   Generating code
-  3 of 20 functions (15.0%) were compiled, the rest were copied from previous compilation.
+  3 of 21 functions (14.3%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
     0 functions had inline decision re-evaluated but remain unchanged
   Finished generating code

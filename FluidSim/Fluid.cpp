@@ -24,7 +24,7 @@ static int map(float input, float inputStart, float inputEnd, int outputStart, i
 }
 
 Fluid::Fluid(float dt, float diffusion, float viscosity) 
-    : density{ 0 }, s{ 0 }, v{ 0 }, u{ 0 }, v0{ 0 }, u0{ 0 }, walls{ 0 }, bf{ 0 } {
+    : density{ 0 }, s{ 0 }, v{ 0 }, u{ 0 }, v0{ 0 }, u0{ 0 }, walls{ 0 } {
     this->dt = dt;
     this->diff = diffusion;
     this->visc = viscosity;
@@ -66,7 +66,7 @@ void Fluid::addVelocity(int x, int y, float amntX, float amntY) {
     v[x][y] += amntY;
 }
 
-void Fluid::render() {
+void Fluid::render() const {
     for (int i = 0; i < N; i++) {
         int x = i * SCALE;
         for (int j = 0; j < N; j++) {
@@ -83,7 +83,7 @@ void Fluid::render() {
     }
 }
 
-void Fluid::renderVelocity() {
+void Fluid::renderVelocity() const {
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
             float x = i * SCALE;
@@ -104,7 +104,7 @@ void Fluid::add_source(float (&x)[N][N], const float (&b)[N][N]) const {
     }
 }
 
-void Fluid::applyBounds(float (&x)[N][N]) {
+void Fluid::applyBounds(float (&x)[N][N]) const {
 // Free-Slip Condition
     for (int i = 0; i < N; i++) {
         if (walls[i][0] == 1)   x[i][0] = 0.f;

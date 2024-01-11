@@ -1,5 +1,4 @@
 #pragma once
-#include <vector>
 #include <raylib.h>
 
 constexpr auto N = 128; // 128

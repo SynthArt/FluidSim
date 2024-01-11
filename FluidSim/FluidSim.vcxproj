@@ -136,9 +136,11 @@
   <ItemGroup>
     <ClCompile Include="Fluid.cpp" />
     <ClCompile Include="FluidSim.cpp" />
+    <ClCompile Include="Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Fluid.h" />
+    <ClInclude Include="Timer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

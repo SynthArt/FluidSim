@@ -1,19 +1,21 @@
 ﻿  FluidSim.cpp
-C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\FluidSim.cpp(9,1): warning C4005: 'PI': macro redefinition
+C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\FluidSim.cpp(10,1): warning C4005: 'PI': macro redefinition
   C:\raylib\raylib\include\raylib.h(110,1):
   see previous definition of 'PI'
   
-C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\FluidSim.cpp(17,59): warning C4305: 'argument': truncation from 'double' to '_Ty'
-C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\FluidSim.cpp(17,59): warning C4305:         with
-C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\FluidSim.cpp(17,59): warning C4305:         [
-C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\FluidSim.cpp(17,59): warning C4305:             _Ty=float
-C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\FluidSim.cpp(17,59): warning C4305:         ]
-C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\FluidSim.cpp(28,66): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\FluidSim.cpp(159,23): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
-C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\FluidSim.cpp(160,23): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\FluidSim.cpp(18,59): warning C4305: 'argument': truncation from 'double' to '_Ty'
+C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\FluidSim.cpp(18,59): warning C4305:         with
+C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\FluidSim.cpp(18,59): warning C4305:         [
+C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\FluidSim.cpp(18,59): warning C4305:             _Ty=float
+C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\FluidSim.cpp(18,59): warning C4305:         ]
+C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\FluidSim.cpp(46,26): warning C4244: '*=': conversion from 'float' to 'unsigned char', possible loss of data
+C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\FluidSim.cpp(47,26): warning C4244: '*=': conversion from 'float' to 'unsigned char', possible loss of data
+C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\FluidSim.cpp(48,26): warning C4244: '*=': conversion from 'float' to 'unsigned char', possible loss of data
+C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\FluidSim.cpp(172,23): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+C:\Users\alla0\Documents\GitHub\FluidSim\FluidSim\FluidSim.cpp(173,23): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
   Generating code
-  1 of 237 functions ( 0.4%) were compiled, the rest were copied from previous compilation.
+  2 of 93 functions ( 2.2%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    1 functions had inline decision re-evaluated but remain unchanged
+    0 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   FluidSim.vcxproj -> C:\Users\alla0\Documents\GitHub\FluidSim\x64\Release\FluidSim.exe
